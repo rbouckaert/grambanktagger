@@ -1,0 +1,96 @@
+<project basedir="." default="dist_all_GramBankTagger" name="BUILD_GRAMBANK_TAGGER">
+    <description>
+        Build GramBankTagger.
+        $Id: build_GRAMBANK_TAGGER.xml $
+    </description>
+
+    <!-- set global properties for this build -->
+    <property name="src" location="../grambanktagger/src" />
+    <property name="build" location="../grambanktagger/build" />
+    <property name="lib" location="../grambanktagger/lib" />
+    <property name="dist" location="../grambanktagger/build/dist" />
+    <property name="test" location="../grambanktagger/test" />
+
+    <property name="main_class_GramBankTagger" value="grambank.grammar.GrambankTagger" />
+
+    <path id="classpath">
+        <fileset dir="${lib}" includes="autocomplete.jar"/>
+        <fileset dir="${lib}" includes="rsyntaxtextarea.jar"/>
+    </path>
+
+
+    <!-- start -->
+    <target name="init">
+        <echo message="${ant.project.name}: ${ant.file}" />
+    </target>
+
+    <target name="clean">
+        <delete dir="${build}" />
+        <delete dir="${test}" />
+    </target>
+
+    <!-- clean previous build, and then compile Java source code, and Juint test -->
+    <target name="build_all_GramBankTagger" depends="clean,compile-all" description="Clean and Build all run-time stuff">
+    </target>
+
+    <!-- clean previous build, compile Java source code, and Junit test, and make the grambanktagger.jar -->
+    <target name="build_jar_all_GramBankTagger"
+            depends="clean,compile-all,dist_all_GramBankTagger"
+            description="Clean and Build all run-time stuff">
+    </target>
+
+
+    <!-- No JUnit Test, clean previous build, compile Java source code, and make the grambanktagger.jar -->
+    <target name="build_jar_all_GramBankTagger_NoJUnitTest"
+            depends="clean,compile-all,dist_all_GramBankTagger"
+            description="Clean and Build all run-time stuff">
+    </target>
+
+    <!-- compile Java source code -->
+    <target name="compile-all" depends="init">
+        <echo>Building GramBankTagger 2</echo>
+        <mkdir dir="${build}" />
+
+        <!-- Compile the java code from ${src} into ${build} /bin -->
+        <javac source="1.8"
+               target="1.8"
+               srcdir="${src}"
+               destdir="${build}"
+               classpathref="classpath"
+               fork="true"
+               memoryinitialsize="256m"
+               memorymaximumsize="1024m"
+               includeAntRuntime='false'>
+            <include name="**/**/**" />
+        </javac>
+
+        <copy todir="${build}">
+            <fileset dir="${src}" includes="**/*.properties" />
+            <fileset dir="${src}" includes="**/*.png" />
+        </copy>
+        <echo message="Successfully compiled." />
+    </target>
+
+    <!-- make the grambanktagger.jar -->
+    <target name="dist_all_GramBankTagger" depends="compile-all" description="create GramBankTagger jar">
+        <!-- Create the distribution directory -->
+        <mkdir dir="${dist}" />
+
+        <!-- Put everything in ${build} into the grambanktagger.jar file -->
+        <jar jarfile="${dist}/grambanktagger.jar">
+            <manifest>
+                <attribute name="Built-By" value="${user.name}" />
+                <attribute name="Main-Class" value="${main_class_GramBankTagger}" />
+            </manifest>
+            <fileset dir="${build}">
+                <include name="**/**/*.class" />
+                <include name="**/**/*.png" />
+            </fileset>
+        	<zipgroupfileset dir="${lib}" includes="autocomplete.jar"/>
+	        <zipgroupfileset dir="${lib}" includes="rsyntaxtextarea.jar"/>
+        </jar>
+
+</target>
+
+ </project>
+
